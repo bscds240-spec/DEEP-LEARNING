@@ -1,0 +1,2237 @@
+Practical No 2 A
+
+Aim: To perform linear and logistic regression as shallow neural networks using the Breast Cancer / Iris or similar dataset and train the models using SGD and Adam optimizers. 
+Code: 
+# Practical: Linear and Logistic Regression using TensorFlow
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.optimizers import SGD, Adam
+
+import numpy as np
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+print("====================================")
+print("LINEAR REGRESSION")
+print("====================================")
+
+# Sample dataset
+X = np.array([[1], [2], [3], [4], [5]], dtype=float)
+Y = np.array([[2], [4], [6], [8], [10]], dtype=float)
+
+# Linear Regression Model
+linear_model = Sequential([
+    Input(shape=(1,)),
+    Dense(1, activation='linear')
+])
+
+# Train using SGD
+linear_model.compile(
+    optimizer=SGD(learning_rate=0.01),
+    loss='mse'
+)
+
+linear_model.fit(X, Y, epochs=200, verbose=0)
+
+print("\nPrediction using SGD:")
+print(linear_model.predict(np.array([[6]]), verbose=0))
+
+# Train using Adam
+linear_model.compile(
+    optimizer=Adam(learning_rate=0.01),
+    loss='mse'
+)
+
+linear_model.fit(X, Y, epochs=200, verbose=0)
+
+print("\nPrediction using Adam:")
+print(linear_model.predict(np.array([[6]]), verbose=0))
+
+
+print("\n====================================")
+print("LOGISTIC REGRESSION")
+print("====================================")
+
+# Load Breast Cancer Dataset
+data = load_breast_cancer()
+
+X = data.data
+y = data.target
+
+# Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Feature Scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Logistic Regression Model
+logistic_model = Sequential([
+    Input(shape=(30,)),
+    Dense(1, activation='sigmoid')
+])
+
+# Train using SGD
+logistic_model.compile(
+    optimizer=SGD(learning_rate=0.01),
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+logistic_model.fit(X_train, y_train, epochs=50, verbose=0)
+
+loss, accuracy = logistic_model.evaluate(X_test, y_test, verbose=0)
+
+print("\nAccuracy using SGD:", round(accuracy * 100, 2), "%")
+
+# Train using Adam
+logistic_model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+logistic_model.fit(X_train, y_train, epochs=50, verbose=0)
+
+loss, accuracy = logistic_model.evaluate(X_test, y_test, verbose=0)
+
+print("Accuracy using Adam:", round(accuracy * 100, 2), "%")
+
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 2 B
+
+Aim: Implement a linear/Logistic regression model using TensorFlow's low- level API (or tf. keras).
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Load Breast Cancer Dataset
+data = load_breast_cancer()
+
+X = data.data
+y = data.target
+
+# Split the dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Feature Scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Create Logistic Regression Model
+model = Sequential([
+    Input(shape=(30,)),
+    Dense(1, activation='sigmoid')
+])
+
+# Compile the Model
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train the Model
+model.fit(X_train, y_train, epochs=50, verbose=1)
+
+# Evaluate the Model
+loss, accuracy = model.evaluate(X_test, y_test)
+
+print("\nTest Accuracy:", accuracy)
+
+Output:
+
+Practical No 2 C
+
+Aim: Train the model on a toy dataset (e.g., housing prices vs. square footage or any other relevant dataset). 
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+import numpy as np
+
+# Toy Dataset
+# Square Footage
+X = np.array([500, 800, 1000, 1200, 1500, 1800], dtype=float)
+
+# House Prices (in thousands)
+Y = np.array([100, 150, 200, 230, 300, 360], dtype=float)
+
+# Normalize data
+X = X / 1000
+Y = Y / 100
+
+# Create Linear Regression Model
+model = Sequential([
+    Input(shape=(1,)),
+    Dense(1, activation='linear')
+])
+
+# Compile the model
+model.compile(
+    optimizer='adam',
+    loss='mean_squared_error'
+)
+
+# Train the model
+model.fit(X, Y, epochs=500, verbose=0)
+
+# Predict price for a house of 1600 sq. ft.
+new_area = np.array([[1.6]])   # 1600/1000
+
+prediction = model.predict(new_area, verbose=0)
+
+print("Predicted House Price (in thousands):")
+print(prediction[0][0] * 100)
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 2 D
+
+Aim: Visualize the loss function and the learned linear relationship.
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Toy Dataset
+# Square Footage
+X = np.array([500, 700, 900, 1100, 1300, 1500], dtype=float)
+
+# House Price (in lakhs)
+Y = np.array([20, 28, 36, 44, 52, 60], dtype=float)
+
+# Normalize Data
+X = X / 1000
+Y = Y / 100
+
+# Create Model
+model = Sequential([
+    Input(shape=(1,)),
+    Dense(1, activation='linear')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='mean_squared_error'
+)
+
+# Train Model
+history = model.fit(
+    X,
+    Y,
+    epochs=500,
+    verbose=0
+)
+
+# Predict values
+predictions = model.predict(X, verbose=0)
+
+# -----------------------------
+# Plot 1 : Loss Function
+# -----------------------------
+plt.figure(figsize=(6,4))
+plt.plot(history.history['loss'])
+plt.title("Training Loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.grid(True)
+plt.show()
+
+# -----------------------------
+# Plot 2 : Linear Relationship
+# -----------------------------
+plt.figure(figsize=(6,4))
+plt.scatter(X * 1000, Y * 100, label="Actual Data")
+plt.plot(X * 1000, predictions * 100, label="Regression Line")
+plt.title("House Price vs Square Footage")
+plt.xlabel("Square Footage")
+plt.ylabel("House Price (Lakhs)")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 2 D
+
+Aim: Make predictions on new data points.
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+import numpy as np
+
+# Training Data
+# Square Footage
+X = np.array([500, 700, 900, 1100, 1300, 1500], dtype=float)
+
+# House Price (in Lakhs)
+Y = np.array([20, 28, 36, 44, 52, 60], dtype=float)
+
+# Normalize Data
+X = X / 1000
+Y = Y / 100
+
+# Create Model
+model = Sequential([
+    Input(shape=(1,)),
+    Dense(1, activation='linear')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='mean_squared_error'
+)
+
+# Train Model
+model.fit(X, Y, epochs=500, verbose=0)
+
+# New Data Points (Square Footage)
+new_data = np.array([[1.0], [1.2], [1.6]])   # 1000, 1200, 1600 sq. ft.
+
+# Make Predictions
+predictions = model.predict(new_data, verbose=0)
+
+print("Predicted House Prices:")
+
+for area, price in zip(new_data, predictions):
+    print(f"Square Footage: {area[0] * 1000:.0f} sq.ft. --> Estimated Price: {price[0] * 100:.2f} Lakhs")
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 3
+
+Aim: Implement a Multilayer Perceptron (MLP) and study the effect of hidden layers, number of neurons, and activation functions on model performance 
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Load Iris Dataset
+iris = load_iris()
+
+X = iris.data
+y = iris.target
+
+# Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Feature Scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Create MLP Model
+model = Sequential([
+    Input(shape=(4,)),
+    Dense(16, activation='relu'),
+    Dense(8, activation='relu'),
+    Dense(3, activation='softmax')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train Model
+history = model.fit(
+    X_train,
+    y_train,
+    epochs=100,
+    verbose=0
+)
+
+# Evaluate Model
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+
+print("Test Accuracy:", accuracy)
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 4 A
+
+Aim: To design and train a Convolutional Neural Network (CNN) for image  classification using the MNIST or Fashion MNIST dataset
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+# Load MNIST Dataset
+(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+# Use a smaller dataset for faster training
+X_train = X_train[:3000]
+y_train = y_train[:3000]
+
+X_test = X_test[:500]
+y_test = y_test[:500]
+
+# Normalize pixel values
+X_train = X_train.astype("float32") / 255.0
+X_test = X_test.astype("float32") / 255.0
+
+# Reshape images
+X_train = X_train.reshape(-1, 28, 28, 1)
+X_test = X_test.reshape(-1, 28, 28, 1)
+
+# Build CNN Model
+model = Sequential([
+    tf.keras.Input(shape=(28, 28, 1)),
+
+    Conv2D(16, (3,3), activation='relu'),
+    MaxPooling2D((2,2)),
+
+    Flatten(),
+
+    Dense(32, activation='relu'),
+
+    Dense(10, activation='softmax')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train Model
+model.fit(
+    X_train,
+    y_train,
+    epochs=2,
+    batch_size=256,
+    verbose=2
+)
+
+# Evaluate Model
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+
+print("\nTest Accuracy:", round(accuracy * 100, 2), "%")
+
+# Predict the first test image
+prediction = model.predict(X_test[:1], verbose=0)
+
+print("Predicted Digit :", prediction.argmax())
+print("Actual Digit    :", y_test[0])
+
+
+Output:
+
+
+Practical No 4 B
+Aim:  Implementing deep neural network for performing binary classification task
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Load Breast Cancer Dataset
+data = load_breast_cancer()
+
+X = data.data
+y = data.target
+
+# Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Feature Scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Build Deep Neural Network
+model = Sequential([
+    Input(shape=(30,)),
+    Dense(64, activation='relu'),
+    Dense(32, activation='relu'),
+    Dense(16, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train Model
+model.fit(
+    X_train,
+    y_train,
+    epochs=20,
+    batch_size=32,
+    verbose=2
+)
+
+# Evaluate Model
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+
+print("\nTest Accuracy:", round(accuracy * 100, 2), "%")
+
+# Predict First Test Sample
+prediction = model.predict(X_test[:1], verbose=0)
+
+print("\nPrediction Probability:", prediction[0][0])
+
+if prediction[0][0] >= 0.5:
+    print("Predicted Class: Malignant")
+else:
+    print("Predicted Class: Benign")
+
+print("Actual Class:", data.target_names[y_test[0]])
+
+
+
+
+
+
+
+
+Output:
+
+
+Practical No 5 A
+
+Aim: Using a deep feed-forward network with two hidden layers for performing multiclass classification and predicting the class. 
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Input
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Load Iris Dataset
+iris = load_iris()
+
+X = iris.data
+y = iris.target
+
+# Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Feature Scaling
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Create Deep Neural Network
+model = Sequential([
+    Input(shape=(4,)),
+    Dense(32, activation='relu'),
+    Dense(16, activation='relu'),
+    Dense(3, activation='softmax')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train Model
+model.fit(
+    X_train,
+    y_train,
+    epochs=50,
+    batch_size=8,
+    verbose=2
+)
+
+# Evaluate Model
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+
+print("\nTest Accuracy:", round(accuracy * 100, 2), "%")
+
+# Predict First Test Sample
+prediction = model.predict(X_test[:1], verbose=0)
+
+predicted_class = np.argmax(prediction)
+
+print("\nPredicted Class:", iris.target_names[predicted_class])
+print("Actual Class   :", iris.target_names[y_test[0]])
+
+
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 5 B
+
+Aim: Write a program to implement deep learning Techniques for image segmentation.
+Code: 
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Create a simple binary image
+image = np.zeros((64, 64), dtype=np.float32)
+
+# Draw a white square
+image[16:48, 16:48] = 1.0
+
+# Input Image
+X = image.reshape(1, 64, 64, 1)
+
+# Ground Truth Mask
+Y = image.reshape(1, 64, 64, 1)
+
+# Build CNN Model for Segmentation
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(64,64,1)),
+    tf.keras.layers.Conv2D(8, (3,3), activation='relu', padding='same'),
+    tf.keras.layers.Conv2D(8, (3,3), activation='relu', padding='same'),
+    tf.keras.layers.Conv2D(1, (1,1), activation='sigmoid', padding='same')
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train Model
+model.fit(X, Y, epochs=20, verbose=0)
+
+# Predict Segmentation Mask
+prediction = model.predict(X)
+
+# Display Results
+plt.figure(figsize=(9,3))
+
+plt.subplot(1,3,1)
+plt.imshow(image, cmap='gray')
+plt.title("Input Image")
+
+plt.subplot(1,3,2)
+plt.imshow(Y[0,:,:,0], cmap='gray')
+plt.title("Original Mask")
+
+plt.subplot(1,3,3)
+plt.imshow(prediction[0,:,:,0] > 0.5, cmap='gray')
+plt.title("Predicted Mask")
+
+plt.show()
+
+Output:
+
+
+
+
+
+
+
+Practical No 6 A
+
+Aim: To implement autoencoders and denoising autoencoders for dimensionality reduction and feature learning using the MNIST dataset.
+Code: 
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+
+# Load MNIST Dataset
+(x_train, _), (x_test, _) = tf.keras.datasets.mnist.load_data()
+
+# Use smaller dataset for faster execution
+x_train = x_train[:5000]
+x_test = x_test[:10]
+
+# Normalize images
+x_train = x_train.astype("float32") / 255.0
+x_test = x_test.astype("float32") / 255.0
+
+# Flatten images
+x_train = x_train.reshape((-1, 784))
+x_test = x_test.reshape((-1, 784))
+
+# -------------------------------
+# AUTOENCODER
+# -------------------------------
+
+input_img = Input(shape=(784,))
+encoded = Dense(64, activation='relu')(input_img)
+decoded = Dense(784, activation='sigmoid')(encoded)
+
+autoencoder = Model(input_img, decoded)
+
+autoencoder.compile(
+    optimizer='adam',
+    loss='binary_crossentropy'
+)
+
+print("\nTraining Autoencoder...\n")
+
+autoencoder.fit(
+    x_train,
+    x_train,
+    epochs=5,
+    batch_size=256,
+    verbose=2
+)
+
+# Reconstruct images
+decoded_imgs = autoencoder.predict(x_test, verbose=0)
+
+# -------------------------------
+# DENOISING AUTOENCODER
+# -------------------------------
+
+noise_factor = 0.3
+
+x_train_noisy = x_train + noise_factor * np.random.normal(size=x_train.shape)
+x_test_noisy = x_test + noise_factor * np.random.normal(size=x_test.shape)
+
+x_train_noisy = np.clip(x_train_noisy, 0., 1.)
+x_test_noisy = np.clip(x_test_noisy, 0., 1.)
+
+input_img2 = Input(shape=(784,))
+encoded2 = Dense(64, activation='relu')(input_img2)
+decoded2 = Dense(784, activation='sigmoid')(encoded2)
+
+denoising_autoencoder = Model(input_img2, decoded2)
+
+denoising_autoencoder.compile(
+    optimizer='adam',
+    loss='binary_crossentropy'
+)
+
+print("\nTraining Denoising Autoencoder...\n")
+
+denoising_autoencoder.fit(
+    x_train_noisy,
+    x_train,
+    epochs=5,
+    batch_size=256,
+    verbose=2
+)
+
+denoised_imgs = denoising_autoencoder.predict(x_test_noisy, verbose=0)
+
+# -------------------------------
+# DISPLAY RESULTS
+# -------------------------------
+
+plt.figure(figsize=(12,6))
+
+for i in range(5):
+
+    # Original Image
+    plt.subplot(3,5,i+1)
+    plt.imshow(x_test[i].reshape(28,28), cmap='gray')
+    plt.title("Original")
+    plt.axis("off")
+
+    # Autoencoder Output
+    plt.subplot(3,5,i+6)
+    plt.imshow(decoded_imgs[i].reshape(28,28), cmap='gray')
+    plt.title("Autoencoder")
+    plt.axis("off")
+
+    # Denoising Autoencoder Output
+    plt.subplot(3,5,i+11)
+    plt.imshow(denoised_imgs[i].reshape(28,28), cmap='gray')
+    plt.title("Denoised")
+    plt.axis("off")
+
+plt.tight_layout()
+plt.show()
+
+
+
+Output:
+
+
+
+
+Practical No 6 B
+
+Aim: Implement a linear/Logistic regression model using TensorFlow's low- level API (or tf. keras).
+
+Code: 
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+
+# Load MNIST Dataset
+(x_train, _), (x_test, _) = tf.keras.datasets.mnist.load_data()
+
+# Use smaller dataset for faster execution
+x_train = x_train[:5000]
+x_test = x_test[:10]
+
+# Normalize pixel values
+x_train = x_train.astype("float32") / 255.0
+x_test = x_test.astype("float32") / 255.0
+
+# Flatten images (28 x 28 = 784)
+x_train = x_train.reshape((-1, 784))
+x_test = x_test.reshape((-1, 784))
+
+# Encoder
+input_img = Input(shape=(784,))
+encoded = Dense(64, activation='relu')(input_img)
+
+# Decoder
+decoded = Dense(784, activation='sigmoid')(encoded)
+
+# Autoencoder Model
+autoencoder = Model(input_img, decoded)
+
+# Compile Model
+autoencoder.compile(
+    optimizer='adam',
+    loss='binary_crossentropy'
+)
+
+# Train Model
+autoencoder.fit(
+    x_train,
+    x_train,
+    epochs=10,
+    batch_size=256,
+    verbose=2
+)
+
+# Reconstruct Images
+decoded_imgs = autoencoder.predict(x_test)
+
+# Display Original and Reconstructed Images
+plt.figure(figsize=(12,4))
+
+for i in range(10):
+
+    # Original Image
+    plt.subplot(2,10,i+1)
+    plt.imshow(x_test[i].reshape(28,28), cmap='gray')
+    plt.title("Original")
+    plt.axis("off")
+
+    # Reconstructed Image
+    plt.subplot(2,10,i+11)
+    plt.imshow(decoded_imgs[i].reshape(28,28), cmap='gray')
+    plt.title("Output")
+    plt.axis("off")
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+Practical No 6 C
+
+Aim: Applying the Autoencoder algorithms for encoding real-world data
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+
+# Load Iris Dataset
+iris = load_iris()
+
+X = iris.data
+
+# Normalize Data
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# Encoder
+input_layer = Input(shape=(4,))
+encoded = Dense(2, activation='relu')(input_layer)
+
+# Decoder
+decoded = Dense(4, activation='linear')(encoded)
+
+# Autoencoder Model
+autoencoder = Model(input_layer, decoded)
+
+# Encoder Model
+encoder = Model(input_layer, encoded)
+
+# Compile
+autoencoder.compile(
+    optimizer='adam',
+    loss='mse'
+)
+
+# Train
+autoencoder.fit(
+    X,
+    X,
+    epochs=100,
+    batch_size=16,
+    verbose=2
+)
+
+# Encode Data
+encoded_data = encoder.predict(X)
+
+# Display Encoded Features
+df = pd.DataFrame(encoded_data, columns=["Feature 1", "Feature 2"])
+
+print("\nEncoded Features:")
+print(df.head())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+Practical No 7
+Aim: Design and train a Variational Autoencoder (VAE) for learning latent representations and generating new data samples.
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras import layers
+import matplotlib.pyplot as plt
+
+# Load MNIST Dataset
+(x_train, _), (x_test, _) = tf.keras.datasets.mnist.load_data()
+
+# Use smaller dataset for faster execution
+x_train = x_train[:5000].astype("float32") / 255.0
+x_test = x_test[:10].astype("float32") / 255.0
+
+# Flatten Images
+x_train = x_train.reshape((-1, 784))
+x_test = x_test.reshape((-1, 784))
+
+latent_dim = 2
+
+# ---------------- Encoder ----------------
+encoder_inputs = tf.keras.Input(shape=(784,))
+x = layers.Dense(128, activation="relu")(encoder_inputs)
+
+z_mean = layers.Dense(latent_dim)(x)
+z_log_var = layers.Dense(latent_dim)(x)
+
+# Sampling Layer
+class Sampling(layers.Layer):
+    def call(self, inputs):
+        z_mean, z_log_var = inputs
+        epsilon = tf.random.normal(shape=tf.shape(z_mean))
+        return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+
+z = Sampling()([z_mean, z_log_var])
+
+encoder = tf.keras.Model(encoder_inputs, [z_mean, z_log_var, z])
+
+# ---------------- Decoder ----------------
+latent_inputs = tf.keras.Input(shape=(latent_dim,))
+x = layers.Dense(128, activation="relu")(latent_inputs)
+decoder_outputs = layers.Dense(784, activation="sigmoid")(x)
+
+decoder = tf.keras.Model(latent_inputs, decoder_outputs)
+
+# ---------------- VAE ----------------
+class VAE(tf.keras.Model):
+    def __init__(self, encoder, decoder):
+        super().__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def train_step(self, data):
+
+        with tf.GradientTape() as tape:
+
+            z_mean, z_log_var, z = self.encoder(data)
+            reconstruction = self.decoder(z)
+
+            reconstruction_loss = tf.reduce_mean(
+                tf.keras.losses.binary_crossentropy(data, reconstruction)
+            ) * 784
+
+            kl_loss = -0.5 * tf.reduce_mean(
+                1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var)
+            )
+
+            total_loss = reconstruction_loss + kl_loss
+
+        grads = tape.gradient(total_loss, self.trainable_weights)
+
+        self.optimizer.apply_gradients(
+            zip(grads, self.trainable_weights)
+        )
+
+        return {"loss": total_loss}
+
+vae = VAE(encoder, decoder)
+
+vae.compile(optimizer="adam")
+
+# Train
+vae.fit(
+    x_train,
+    epochs=10,
+    batch_size=256,
+    verbose=2
+)
+
+# Generate New Images
+random_points = tf.random.normal(shape=(10, latent_dim))
+
+generated = decoder.predict(random_points)
+
+# Display Generated Images
+plt.figure(figsize=(12,2))
+
+for i in range(10):
+
+    plt.subplot(1,10,i+1)
+
+    plt.imshow(generated[i].reshape(28,28), cmap="gray")
+
+    plt.axis("off")
+
+plt.show()
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 8
+Aim: Applying Generative Adversarial Networks for image generation and unsupervised tasks, implement a Generative Adversarial Network (GAN) for image generation using the MNIST or CIFAR 10 dataset.
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Reshape, LeakyReLU
+import matplotlib.pyplot as plt
+
+# -----------------------------
+# Load MNIST Dataset
+# -----------------------------
+(X_train, _), (_, _) = tf.keras.datasets.mnist.load_data()
+
+# Use 5000 images for faster training
+X_train = X_train[:5000]
+
+# Normalize images to [-1,1]
+X_train = (X_train.astype("float32") - 127.5) / 127.5
+X_train = X_train.reshape(-1, 28, 28, 1)
+
+# Create dataset
+dataset = tf.data.Dataset.from_tensor_slices(X_train)
+dataset = dataset.shuffle(5000).batch(64)
+
+# -----------------------------
+# Generator
+# -----------------------------
+generator = Sequential([
+    tf.keras.Input(shape=(100,)),
+
+    Dense(256),
+    LeakyReLU(0.2),
+
+    Dense(512),
+    LeakyReLU(0.2),
+
+    Dense(784, activation="tanh"),
+    Reshape((28, 28, 1))
+])
+
+# -----------------------------
+# Discriminator
+# -----------------------------
+discriminator = Sequential([
+    tf.keras.Input(shape=(28, 28, 1)),
+
+    Flatten(),
+
+    Dense(512),
+    LeakyReLU(0.2),
+
+    Dense(256),
+    LeakyReLU(0.2),
+
+    Dense(1, activation="sigmoid")
+])
+
+# Loss Function
+loss_function = tf.keras.losses.BinaryCrossentropy()
+
+# Optimizers
+generator_optimizer = tf.keras.optimizers.Adam(0.0002, beta_1=0.5)
+discriminator_optimizer = tf.keras.optimizers.Adam(0.0002, beta_1=0.5)
+
+# -----------------------------
+# Training Step
+# -----------------------------
+@tf.function
+def train_step(images):
+
+    noise = tf.random.normal([images.shape[0], 100])
+
+    with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+
+        fake_images = generator(noise, training=True)
+
+        real_output = discriminator(images, training=True)
+        fake_output = discriminator(fake_images, training=True)
+
+        generator_loss = loss_function(
+            tf.ones_like(fake_output),
+            fake_output
+        )
+
+        real_loss = loss_function(
+            tf.ones_like(real_output),
+            real_output
+        )
+
+        fake_loss = loss_function(
+            tf.zeros_like(fake_output),
+            fake_output
+        )
+
+        discriminator_loss = real_loss + fake_loss
+
+    generator_gradients = gen_tape.gradient(
+        generator_loss,
+        generator.trainable_variables
+    )
+
+    discriminator_gradients = disc_tape.gradient(
+        discriminator_loss,
+        discriminator.trainable_variables
+    )
+
+    generator_optimizer.apply_gradients(
+        zip(generator_gradients,
+            generator.trainable_variables)
+    )
+
+    discriminator_optimizer.apply_gradients(
+        zip(discriminator_gradients,
+            discriminator.trainable_variables)
+    )
+
+# -----------------------------
+# Training
+# -----------------------------
+epochs = 30
+
+for epoch in range(epochs):
+
+    for batch in dataset:
+        train_step(batch)
+
+    print("Epoch", epoch + 1, "/", epochs, "Completed")
+
+# -----------------------------
+# Generate New Images
+# -----------------------------
+noise = tf.random.normal([10, 100])
+
+generated_images = generator(noise, training=False)
+
+# -----------------------------
+# Display Images
+# -----------------------------
+plt.figure(figsize=(12,4))
+
+for i in range(10):
+
+    plt.subplot(2,5,i+1)
+
+    image = (generated_images[i, :, :, 0] + 1) / 2
+
+    plt.imshow(image,
+               cmap="gray",
+               vmin=0,
+               vmax=1)
+
+    plt.axis("off")
+
+plt.suptitle("Generated Handwritten Digits using GAN")
+
+plt.tight_layout()
+
+plt.show()
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 9A
+Aim: Write a program to predict a caption for a sample image using LSTM
+Code: 
+import tensorflow as tf
+import numpy as np
+
+# Vocabulary
+words = [
+    "a", "man", "woman", "boy", "girl",
+    "dog", "cat", "is", "playing",
+    "running", "walking", "with",
+    "ball", "park"
+]
+
+# Word Dictionary
+word_to_id = {word: i+1 for i, word in enumerate(words)}
+id_to_word = {i+1: word for i, word in enumerate(words)}
+
+vocab_size = len(words) + 1
+
+# Training Data
+X = np.array([
+    [word_to_id["a"], word_to_id["man"], word_to_id["is"]],
+    [word_to_id["a"], word_to_id["woman"], word_to_id["is"]],
+    [word_to_id["a"], word_to_id["boy"], word_to_id["is"]],
+    [word_to_id["a"], word_to_id["girl"], word_to_id["is"]],
+    [word_to_id["a"], word_to_id["dog"], word_to_id["is"]],
+    [word_to_id["a"], word_to_id["cat"], word_to_id["is"]]
+])
+
+y = np.array([
+    word_to_id["running"],
+    word_to_id["walking"],
+    word_to_id["playing"],
+    word_to_id["walking"],
+    word_to_id["running"],
+    word_to_id["playing"]
+])
+
+# Build LSTM Model
+model = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, 16),
+    tf.keras.layers.LSTM(32),
+    tf.keras.layers.Dense(vocab_size, activation="softmax")
+])
+
+# Compile Model
+model.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+# Train Model
+model.fit(X, y, epochs=300, verbose=0)
+
+# -----------------------------
+# Sample Image (Assume image contains a man)
+# -----------------------------
+sample = np.array([
+    [
+        word_to_id["a"],
+        word_to_id["man"],
+        word_to_id["is"]
+    ]
+])
+
+prediction = model.predict(sample, verbose=0)
+
+predicted_word = id_to_word[np.argmax(prediction)]
+
+caption = "A man is " + predicted_word
+
+print("Predicted Caption:")
+print(caption)
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 9B
+Aim: Design and train a Long Short Term Memory (LSTM) network to learn long term dependencies in sequential data.
+
+Code: 
+import tensorflow as tf
+import numpy as np
+
+# -----------------------------
+# Create Sequential Data
+# -----------------------------
+sequence = np.array([1,2,3,4,5,6,7,8,9,10])
+
+X = []
+y = []
+
+# Create input-output pairs
+for i in range(len(sequence)-3):
+    X.append(sequence[i:i+3])
+    y.append(sequence[i+3])
+
+X = np.array(X)
+y = np.array(y)
+
+# Reshape for LSTM
+X = X.reshape((X.shape[0], X.shape[1], 1))
+
+# -----------------------------
+# Build LSTM Model
+# -----------------------------
+model = tf.keras.Sequential([
+    tf.keras.layers.LSTM(32, input_shape=(3,1)),
+    tf.keras.layers.Dense(1)
+])
+
+# Compile Model
+model.compile(
+    optimizer='adam',
+    loss='mse'
+)
+
+# Train Model
+model.fit(
+    X,
+    y,
+    epochs=300,
+    verbose=0
+)
+
+# -----------------------------
+# Prediction
+# -----------------------------
+test = np.array([8,9,10]).reshape((1,3,1))
+
+prediction = model.predict(test, verbose=0)
+
+print("Input Sequence : [8 9 10]")
+print("Predicted Next Number :", round(prediction[0][0]))
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+Practical No 10 A
+Aim: Demonstrate recurrent neural network that learns to perform sequence analysis for stock price.(google stock price.
+
+Dataset: 
+
+DateOpenHighLowCloseVolume01-01-202510010299101150000002-01-2025101104100103151500003-01-2025103105101104152000004-01-2025102104101103153500005-01-2025104107103106154000006-01-2025106108104107155500007-01-2025105107103104156000008-01-2025107109106108157000009-01-2025108110107109158500010-01-20251101121091111600000
+Save the file as: Google_Stock_Price_Train.csv
+Code: 
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+# -----------------------------
+# Load Dataset
+# -----------------------------
+dataset = pd.read_csv("Google_Stock_Price_Train.csv")
+
+print(dataset)
+
+# Use 'Open' column
+training_set = dataset.iloc[:, 1:2].values
+
+# -----------------------------
+# Feature Scaling
+# -----------------------------
+scaler = MinMaxScaler(feature_range=(0,1))
+training_set = scaler.fit_transform(training_set)
+
+# -----------------------------
+# Create Training Data
+# -----------------------------
+window_size = 3
+
+X_train = []
+y_train = []
+
+for i in range(window_size, len(training_set)):
+    X_train.append(training_set[i-window_size:i, 0])
+    y_train.append(training_set[i, 0])
+
+X_train = np.array(X_train)
+y_train = np.array(y_train)
+
+# Reshape for LSTM
+X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))
+
+print("X_train Shape :", X_train.shape)
+print("y_train Shape :", y_train.shape)
+
+# -----------------------------
+# Build LSTM Model
+# -----------------------------
+model = Sequential([
+    LSTM(50, input_shape=(window_size,1)),
+    Dense(1)
+])
+
+# -----------------------------
+# Compile Model
+# -----------------------------
+model.compile(
+    optimizer='adam',
+    loss='mean_squared_error'
+)
+
+# -----------------------------
+# Train Model
+# -----------------------------
+model.fit(
+    X_train,
+    y_train,
+    epochs=100,
+    batch_size=1,
+    verbose=1
+)
+
+# -----------------------------
+# Predict Next Stock Price
+# -----------------------------
+last_days = training_set[-window_size:]
+
+X_test = np.array([last_days])
+
+prediction = model.predict(X_test)
+
+prediction = scaler.inverse_transform(prediction)
+
+print("\nPredicted Next Google Stock Price:")
+print(round(prediction[0][0], 2))
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+Practical No 10 B
+Aim: Implement a Recurrent Neural Network (RNN) for sequence modeling tasks such as text classification or time-series prediction
+
+Code: 
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import SimpleRNN, Dense
+from sklearn.preprocessing import MinMaxScaler
+
+# -----------------------------
+# Sample Time-Series Data
+# -----------------------------
+data = np.array([
+100,102,101,103,105,106,108,110,111,113,
+115,116,118,120,121,123,125,127,129,130
+], dtype=float)
+
+# -----------------------------
+# Normalize Data
+# -----------------------------
+scaler = MinMaxScaler()
+data = scaler.fit_transform(data.reshape(-1,1))
+
+# -----------------------------
+# Create Sequences
+# -----------------------------
+window_size = 3
+
+X = []
+y = []
+
+for i in range(window_size, len(data)):
+    X.append(data[i-window_size:i,0])
+    y.append(data[i,0])
+
+X = np.array(X)
+y = np.array(y)
+
+# Reshape for RNN
+X = X.reshape((X.shape[0], X.shape[1], 1))
+
+# -----------------------------
+# Build RNN Model
+# -----------------------------
+model = Sequential([
+    SimpleRNN(16, input_shape=(window_size,1)),
+    Dense(1)
+])
+
+# -----------------------------
+# Compile
+# -----------------------------
+model.compile(
+    optimizer='adam',
+    loss='mean_squared_error'
+)
+
+# -----------------------------
+# Train
+# -----------------------------
+model.fit(
+    X,
+    y,
+    epochs=200,
+    verbose=0
+)
+
+# -----------------------------
+# Predict Next Value
+# -----------------------------
+test = np.array([[127,129,130]])
+test = scaler.transform(test.reshape(-1,1))
+test = test.reshape((1,window_size,1))
+
+prediction = model.predict(test, verbose=0)
+
+prediction = scaler.inverse_transform(prediction)
+
+print("Input Values : [127 129 130]")
+print("Predicted Next Value :", round(prediction[0][0],2))
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 10C
+Aim: Write a program for character recognition using RNN and compare it with CNN
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import SimpleRNN, Conv2D, MaxPooling2D
+from tensorflow.keras.layers import Flatten, Dense
+import matplotlib.pyplot as plt
+import numpy as np
+
+# ------------------------------------
+# Load MNIST Dataset
+# ------------------------------------
+(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+# Use smaller dataset for faster execution
+X_train = X_train[:10000]
+y_train = y_train[:10000]
+
+X_test = X_test[:2000]
+y_test = y_test[:2000]
+
+# Normalize
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# =====================================================
+# RNN MODEL
+# =====================================================
+
+print("\n========== RNN MODEL ==========")
+
+rnn_model = Sequential([
+    tf.keras.Input(shape=(28,28)),
+    SimpleRNN(64),
+    Dense(10, activation='softmax')
+])
+
+rnn_model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+rnn_model.fit(
+    X_train,
+    y_train,
+    epochs=3,
+    batch_size=128,
+    verbose=1
+)
+
+rnn_loss, rnn_accuracy = rnn_model.evaluate(
+    X_test,
+    y_test,
+    verbose=0
+)
+
+# =====================================================
+# CNN MODEL
+# =====================================================
+
+print("\n========== CNN MODEL ==========")
+
+# Reshape images
+X_train_cnn = X_train.reshape(-1,28,28,1)
+X_test_cnn = X_test.reshape(-1,28,28,1)
+
+cnn_model = Sequential([
+    tf.keras.Input(shape=(28,28,1)),
+    Conv2D(16,(3,3),activation='relu'),
+    MaxPooling2D((2,2)),
+    Flatten(),
+    Dense(32,activation='relu'),
+    Dense(10,activation='softmax')
+])
+
+cnn_model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+cnn_model.fit(
+    X_train_cnn,
+    y_train,
+    epochs=3,
+    batch_size=128,
+    verbose=1
+)
+
+cnn_loss, cnn_accuracy = cnn_model.evaluate(
+    X_test_cnn,
+    y_test,
+    verbose=0
+)
+
+# =====================================================
+# Prediction
+# =====================================================
+
+rnn_prediction = rnn_model.predict(X_test[:1], verbose=0)
+cnn_prediction = cnn_model.predict(X_test_cnn[:1], verbose=0)
+
+print("\nActual Digit      :", y_test[0])
+print("RNN Prediction    :", np.argmax(rnn_prediction))
+print("CNN Prediction    :", np.argmax(cnn_prediction))
+
+# =====================================================
+# Show Test Image
+# =====================================================
+
+plt.imshow(X_test[0], cmap='gray')
+plt.title("Test Image")
+plt.axis("off")
+plt.show()
+
+# =====================================================
+# Accuracy Comparison
+# =====================================================
+
+print("\n===============================")
+print("MODEL COMPARISON")
+print("===============================")
+
+print("RNN Accuracy :", round(rnn_accuracy*100,2), "%")
+print("CNN Accuracy :", round(cnn_accuracy*100,2), "%")
+
+print("\nConclusion:")
+if cnn_accuracy > rnn_accuracy:
+    print("CNN performs better than RNN for character recognition.")
+else:
+    print("RNN performs better than CNN.")
+
+
+
+
+
+Output:
+
+
+
+
+Practical No 11
+Aim: Apply regularization techniques such as L2 weight decay, Dropout, and Early Stopping to reduce overfitting in neural networks using the Fashion MNIST dataset
+
+Code: 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Dropout
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+
+# Load MNIST Dataset
+(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+# Normalize
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+# Small dataset for fast training
+X_train = X_train[:2000]
+y_train = y_train[:2000]
+
+X_test = X_test[:500]
+y_test = y_test[:500]
+
+# Build Model
+model = Sequential([
+    Flatten(input_shape=(28,28)),
+
+    Dense(64, activation='relu',
+          kernel_regularizer=l2(0.001)),   # L2 Regularization
+
+    Dropout(0.3),                          # Dropout
+
+    Dense(32, activation='relu',
+          kernel_regularizer=l2(0.001)),
+
+    Dense(10, activation='softmax')
+])
+
+# Compile
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Early Stopping
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=1,
+    restore_best_weights=True
+)
+
+# Train
+model.fit(
+    X_train,
+    y_train,
+    epochs=5,
+    batch_size=128,
+    validation_split=0.2,
+    callbacks=[early_stop],
+    verbose=2
+)
+
+# Evaluate
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+
+print("\nTest Accuracy:", round(accuracy*100,2), "%")
+
+# Prediction
+prediction = model.predict(X_test[:1], verbose=0)
+
+print("Predicted Digit:", prediction.argmax())
+print("Actual Digit   :", y_test[0])
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical No 12
+Aim: To study and implement a Boltzmann Machine for modeling probability distributions over binary data.
+Code: 
+import numpy as np
+from sklearn.neural_network import BernoulliRBM
+
+# -----------------------------
+# Binary Dataset
+# -----------------------------
+X = np.array([
+    [1,1,1,0,0,0],
+    [1,1,0,0,0,0],
+    [1,0,1,0,0,0],
+    [0,0,0,1,1,1],
+    [0,0,0,1,1,0],
+    [0,0,0,1,0,1]
+])
+
+print("Training Data:\n")
+print(X)
+
+# -----------------------------
+# Create RBM Model
+# -----------------------------
+rbm = BernoulliRBM(
+    n_components=2,
+    learning_rate=0.1,
+    n_iter=100,
+    random_state=0
+)
+
+# -----------------------------
+# Train Model
+# -----------------------------
+rbm.fit(X)
+
+print("\nTraining Completed Successfully!")
+
+# -----------------------------
+# Hidden Representation
+# -----------------------------
+hidden = rbm.transform(X)
+
+print("\nHidden Features:\n")
+print(np.round(hidden,3))
+
+# -----------------------------
+# Reconstruction
+# -----------------------------
+reconstructed = rbm.gibbs(X)
+
+print("\nReconstructed Data:\n")
+print(np.round(reconstructed))
+
+
+
+Output:
+
+
+
+
+
+
+
+
+Practical No 13
+Aim: To implement a Restricted Boltzmann Machine (RBM) for unsupervised feature learning using Contrastive Divergence
+
+Code: 
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_digits
+from sklearn.neural_network import BernoulliRBM
+from sklearn.preprocessing import MinMaxScaler
+
+# --------------------------------
+# Load Digits Dataset
+# --------------------------------
+
+digits = load_digits()
+
+X = digits.data
+y = digits.target
+
+# --------------------------------
+# Normalize Data
+# --------------------------------
+
+scaler = MinMaxScaler()
+
+X = scaler.fit_transform(X)
+
+# Convert to Binary Data
+X = (X > 0.5).astype(int)
+
+# --------------------------------
+# Create RBM
+# --------------------------------
+
+rbm = BernoulliRBM(
+    n_components=32,
+    learning_rate=0.05,
+    batch_size=20,
+    n_iter=20,
+    random_state=0,
+    verbose=True
+)
+
+# --------------------------------
+# Train RBM
+# --------------------------------
+
+print("Training RBM using Contrastive Divergence...\n")
+
+rbm.fit(X)
+
+print("\nTraining Completed Successfully!")
+
+# --------------------------------
+# Learn Hidden Features
+# --------------------------------
+
+hidden = rbm.transform(X)
+
+print("\nShape of Hidden Features :", hidden.shape)
+
+# --------------------------------
+# Display Original Image
+# --------------------------------
+
+plt.figure(figsize=(8,4))
+
+plt.subplot(1,2,1)
+plt.imshow(digits.images[0], cmap="gray")
+plt.title("Original Digit")
+plt.axis("off")
+
+# --------------------------------
+# Display Learned Features
+# --------------------------------
+
+plt.subplot(1,2,2)
+plt.imshow(hidden[0].reshape(4,8), cmap="gray")
+plt.title("Learned Features")
+plt.axis("off")
+
+plt.show()
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
